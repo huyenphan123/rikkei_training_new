@@ -17,21 +17,22 @@
         <!-- /.search form -->
         <!-- sidebar menu: : style can be found in sidebar.less -->
         <ul class="sidebar-menu tree" data-widget="tree">
-            <li class="">
-                <a href="{{route('staffs.index')}}">
-                    <b>
+            @can('employee-management')
+                <li class="">
+                    <a href="{{route('staffs.index')}}">
+                        <b>
                             <span>Employee Management</span>
-                    </b>
+                        </b>
 
-                </a>
-            </li>
+                    </a>
+                </li>
+            @endcan
 
             <li class="">
                 <a href="{{route('departments.index')}}">
                     <b> <span>Department Management</span></b>
                 </a>
             </li>
-
         </ul>
     </section>
     <!-- /.sidebar -->

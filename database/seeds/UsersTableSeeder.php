@@ -15,15 +15,15 @@ class UsersTableSeeder extends Seeder
     public function run()
     {
         DB::table('users')->Insert([
-        ['id'=>1,'name'=>'root',
-            'email'=>'root@gmail.com',
-            'password'=>Hash::make('12345678'),
-            'is_first_login'=>1]
-    ]);
+            ['id'=>1,'name'=>'admin',
+                'email'=>'admin@gmail.com',
+                'password'=>Hash::make('12345678'),
+                'is_first_login'=>1]
+        ]);
         Role::create([
             'user_id' => 1,
             'department_id' => null,
-            'type' => 'Admin'
+            'type' => '0'
         ]);
     }
 }

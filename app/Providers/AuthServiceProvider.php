@@ -15,7 +15,7 @@ class AuthServiceProvider extends ServiceProvider
      * @var array
      */
     protected $policies = [
-         'App\Model' => 'App\Policies\ModelPolicy',
+        'App\Model' => 'App\Policies\ModelPolicy',
     ];
 
     /**
@@ -27,14 +27,14 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        Gate::define('add-user', function ($user ) {
-            $arr_roles = Role::where('user_id',$user->id)->get();
+        Gate::define('add-user', function ($user) {
+            $arr_roles = Role::where('user_id', $user->id)->get();
 //            dd($arr_roles[0]); die;
-            if (count($arr_roles)==0 || $arr_roles == null) {
+            if (count($arr_roles) == 0 || $arr_roles == null) {
                 return false;
             } elseif (count($arr_roles) >= 1) {
                 foreach ($arr_roles as $role) {
-                    if ($role->type == 'Admin') {
+                    if ($role->type == 0) {
                         return true;
                     } else {
                         return false;
@@ -45,8 +45,39 @@ class AuthServiceProvider extends ServiceProvider
             }
         });
 
-//        Gate::define('reset-password', function ($user){
-//
-//        });
+        Gate::define('reset-password', function ($user) {
+            $arr_roles = Role::where('user_id', $user->id)->get();
+//            dd($arr_roles[0]); die;
+            if (count($arr_roles) == 0 || $arr_roles == null) {
+                return false;
+            } elseif (count($arr_roles) >= 1) {
+                foreach ($arr_roles as $role) {
+                    if ($role->type == 0) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+            } else {
+                return false;
+            }
+        });
+
+        Gate::define('employee-management', function ($user) {
+            $arr_roles = Role::where('user_id', $user->id)->get();
+            if (count($arr_roles) == 0 || $arr_roles == null) {
+                return false;
+            } elseif (count($arr_roles) >= 1) {
+                foreach ($arr_roles as $role) {
+                    if ($role->type == 0) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+            } else {
+                return false;
+            }
+        });
     }
 }

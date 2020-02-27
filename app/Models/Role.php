@@ -15,6 +15,11 @@ class Role extends Model
     protected $table = 'roles';
     protected $dates = ['deleted_at'];
     protected $fillable = ['type','user_id','department_id'];
+    const ROLE = [
+        0 => 'Admin',
+        1 => 'Head Department',
+        2 => 'Employee'
+    ];
 
     public function user()
     {

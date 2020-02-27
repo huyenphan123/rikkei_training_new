@@ -1,7 +1,7 @@
-@extends('admin.layouts.default')
+@extends('admin.layouts.app')
 @section('title', 'Update Staff')
 @section('name_feature', 'Update Staff')
-@section('content')
+@section('main-content')
     <div class="container-fluid" style="height: 600px">
         <div class="container mt-3" style="height: 100%">
             <form method="POST" action="{{route('staffs.update',[$users->id])}}"

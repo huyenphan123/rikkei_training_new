@@ -10,8 +10,12 @@ use App\User;
 use App\Models\Role;
 use App\Mail\CreateUser;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Mail;
+use App\Exports\UsersAllExport;
+use Maatwebsite\Excel\Facades\Excel;
+
 class StaffController extends Controller
 {
     /**
@@ -25,6 +29,7 @@ class StaffController extends Controller
                 $users = DB::table('roles')
                     ->join('users', 'users.id', '=','roles.user_id')
                     ->join('departments', 'departments.id', '=','roles.department_id')
+//                    ->select('roles.id as role_id','users.id as user_id' , 'users.name AS user_name', 'users.email', 'departments.id AS department_id', 'departments.name AS department_name', 'roles.type')
                     ->select('users.id', 'users.name AS user_name', 'users.email' , 'departments.name AS department_name', 'roles.type')
                     ->where('users.id', '>', 1)
                     ->where(function($q) use ($request) {
@@ -35,6 +40,7 @@ class StaffController extends Controller
                     })
 
                     ->orderBy('users.id', 'asc')->paginate(7);
+//            dd( $users );
               if(count($users)==0){
 //                  dd(empty($users)); die;
                   return redirect()->route('staffs.index')
@@ -45,10 +51,13 @@ class StaffController extends Controller
             $users = DB::table('roles')
                 ->join('users', 'users.id', '=', 'roles.user_id')
                 ->join('departments', 'departments.id', '=', 'roles.department_id')
-                ->select('roles.id as role_id','users.id as user_id' , 'users.name AS user_name', 'users.email', 'departments.id AS department_id', 'departments.name AS department_name', 'roles.type')
+                ->select('users.id', 'users.name AS user_name', 'users.email' , 'departments.name AS department_name', 'roles.type')
+//                ->select('roles.id as role_id','users.id as user_id' , 'users.name AS user_name', 'users.email', 'departments.id AS department_id', 'departments.name AS department_name', 'roles.type')
                 ->where('users.id', '>', 1)
                 ->orderBy('users.id', 'asc')->paginate(7);
+//            dd( $users );
         }
+//        dd( $users );
 
         return view('admin.staffs.index', compact('users'));
 
@@ -79,13 +88,14 @@ class StaffController extends Controller
         $user = User::create ([
            'name' => $request->name,
            'email' => $request->email,
-            'password'=> bcrypt($request->password)
+            'password'=> bcrypt($request->password),
+            'is_first_login' => 0
         ]);
 //        dd($user);die;
 
         $role = Role::create ([
            'user_id' => $user->id,
-           'department_id' =>$request->department_id [0] ,
+           'department_id' =>  $request->department_id,
             'type' =>$request->type
         ]);
 //        dd($role);die;
@@ -120,15 +130,10 @@ class StaffController extends Controller
             ->select('users.name as user_name', 'departments.name as department_name', 'roles.type', 'users.email')
             ->where('users.id', '=', $id)
             ->get();
-//        $departments = $departments->toArray();
-//        dd($departments);
-        $data =[
-            'user'=> $user,
-            'department' => $departments,
-        ];
-//        dd($data);
 
-        return view('admin.staffs.detail', compact('data'));
+//        dd($departments);die;
+
+        return view('admin.staffs.detail', compact(['user','departments']));
     }
 
     /**
@@ -181,7 +186,11 @@ class StaffController extends Controller
 
         $id = $request->id;
 
-        DB::table('roles')->where('id', $id)->delete();
+        DB::table('roles')
+            ->where('id', $id)->delete();
+
+        DB::table('users')
+            ->where('id', $id)->delete();
 
 //        $user = User::findOrFail($id);
 //        $roles = Role::findOrFail($id);
@@ -196,6 +205,21 @@ class StaffController extends Controller
 
         return redirect('staffs')->with('success', 'Delete user successed!');
     }
+
+    public function exportAll(Request $request)
+    {
+        return Excel::download(new UsersAllExport, 'UsersAll.xlsx');
+    }
+
+
+
+//    public function deleteAll(Request $request)
+//    {
+//        $ids= $request->$ids;
+//        DB::table("users")->whereIn('id',explode(",", $ids))->delete();
+//        return back();
+//    }
+
 
     }
 

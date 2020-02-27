@@ -17,9 +17,11 @@ class ResetPasswordController extends Controller
 {
     public function multipleReset(Request $request)
     {
-        $id_array = explode(',', $request->ids);
+        $id_array = explode(',', $request->list_id);
 
-        if ($request->ids != null) {
+//        dd($id_array);die;
+
+        if ($request->list_id != null) {
             foreach ($id_array as $id) {
                 $user = User::where('id', $id)->first();
                 $passnew = Str::random(8);
@@ -30,7 +32,8 @@ class ResetPasswordController extends Controller
                 }
             }
             return redirect()->back()->with('success','Update password successed!');
-        } else {
+        }
+        else {
             return redirect()->back()->with('error','You need select account to reset password');
         }
     }

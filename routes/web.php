@@ -11,32 +11,21 @@
 |
 */
 
+use App\Http\Controllers\Admin\StaffController;
 use Illuminate\Http\Request;
-
+Route::get('default_layout', function () {
+    return view('admin.layouts.app');
+});
 
 Auth::routes(['verify' => true]);
-
-//Route::get('test', function () {
-//    $alphabet = "abcdefghijklmnopqrstuwxyzABCDEFGHIJKLMNOPQRSTUWXYZ0123456789";
-//    $pass = array(); //remember to declare $pass as an array
-//    $alphaLength = strlen($alphabet) - 1; //put the length -1 in cache
-//    for ($i = 0; $i < 8; $i++) {
-//        $n = rand(0, $alphaLength);
-//        $pass[] = $alphabet[$n];
-//    }
-//    echo implode($pass);
-//});
-
 
 Route::get('test', function () {
     return view('home');
 })->name('test');
 
-
 Route::get('/login', 'Auth\LoginController@getLogin')->name('login');
 
 Route::post('/login', 'Auth\LoginController@postLogin')->name('users.login');
-
 
 Route::group(['middleware' => ['check.login']], function () {
     Route::get('/logout', 'Auth\LoginController@logout')->name('logout');
@@ -49,8 +38,6 @@ Route::group(['middleware' => ['check.login']], function () {
     Route::group(['namespace' => 'Admin'], function () {
         Route::group(['prefix' => 'staffs'], function () {
             Route::get('/', 'StaffController@index')->name('staffs.index');
-//            Route::get('/abc', function (Request $request) {
-//            })->name('staffs.abc');
 
             Route::get('/create', 'StaffController@create')->name('staffs.create');
             Route::post('/create', 'StaffController@store')->name('staffs.store');
@@ -61,8 +48,13 @@ Route::group(['middleware' => ['check.login']], function () {
             Route::post('/edit/{id}', 'StaffController@update')->name('staffs.update');
 
             Route::post('/delete', 'StaffController@destroy')->name('staffs.destroy');
+            Route::post('/deleteAll', 'StaffController@deleteAll')->name('staffs.deleteAll');
 
             Route::post('/reset', 'ResetPasswordController@multipleReset')->name('staffs.reset');
+
+            Route::get('/exportAll', 'StaffController@exportAll')->name('staffs.exportAll');
+
+
         });
 
         Route::group(['prefix' => 'departments'], function () {
@@ -78,16 +70,15 @@ Route::group(['middleware' => ['check.login']], function () {
 
             Route::get('/detail/{id}', 'DepartmentController@show')->name('departments.detail');
 
-//            Route::get('/add-user', 'DepartmentController@showView')->name('departments.showView');
             Route::post('/add-user', 'DepartmentController@insertUser')->name('departments.insertUser');
 
             Route::get('/autocomplete', 'SearchController@autocomplete') -> name('autocomplete');
 
+            Route::post('/changeLeader', 'Department@setLeader')->name('departments.setLeader');
 
+            Route::get('/exportUser/{id}', 'DepartmentController@exportUser')->name('departments.exportUser');
         });
     });
-
-
 
 });
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exports\UsersDepartmentExport;
 use App\Http\Controllers\Controller;
 use App\Models\Department;
 use App\Models\Role;
@@ -11,6 +12,11 @@ use DB;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreDepartRequest;
 use App\Http\Requests\UpdateDepartRequest;
+use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
+//use Excel;
+
+
 
 class DepartmentController extends Controller
 {
@@ -80,23 +86,24 @@ class DepartmentController extends Controller
      */
     public function show(Request $request, $id)
     {
-//        dd($request->id);
-
         $users = DB::table('roles')
             ->join('users', 'users.id', '=','roles.user_id')
             ->join('departments', 'departments.id', '=', 'roles.department_id' )
             ->select('users.name')
-            ->where('departments.id', '<>', $request->id)
+//            ->where('departments.id', '<>', $request->id)
             ->orderBy('name', 'desc')
             ->get();
 
+
         $department = Department::findOrFail($id);
+//        dd($department);
         $listUsers = DB::table('roles')
             ->join('users', 'users.id', '=', 'roles.user_id')
             ->select('users.id','users.name', 'roles.type')
             ->where('department_id', $id)
-            ->orderBy('roles.type', 'desc')
+            ->orderBy('roles.type', 'asc')
             ->get();
+//        dd($listUsers);
 
         $countUsers = count($listUsers);
 
@@ -139,24 +146,110 @@ class DepartmentController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request)
     {
-        Department::findOrFail($id)->delete();
+        $id = $request->id;
+//        dd($id);die;
+     DB::table('departments')
+         ->where('id', $id) ->delete();
+
+//        Department::findOrFail($id)->delete();
         return redirect('/departments')->with('success', 'Delete Successed!');
     }
 
 
-    public function insertUser(Request $request, $id)
+    public function insertUser(Request $request)
     {
-        $user = User::findOrFail($id);
-        dd($user);
-        $user = Role::create([
-//           'user_id'=>$request->user_name,
-            'department_id'=>$request->department_id,
-            'type'=>$request->inputRole
-        ]);
-//        dd($user);
-return back();
-//        return view('admin.departments.detail', compact('user'));
+//        dd($request->department_id);die;
+
+//        $role = $request->inputRole;
+//        dd($role);die;
+
+        $id = $request->userId;
+        $oldRole = Role::where('user_id', $id)
+            ->where('department_id', $request->department_id)
+            ->count();
+
+        if ($oldRole > 0) {
+            return back()->with('warning', 'User already exists. Please choose another account');
+        }
+        else {
+            //ép kiểu sang int để so sánh với role đã quy ước trong model Role.php
+            if ((int)$request->inputRole === 1) {
+                return back()->with('warning', 'Head Department already exists. Please choose another role');
+            } else {
+                $user = User::findOrFail($id);
+//        dd($user->name);die;
+
+                $user = Role::create([
+                    'user_id' => $request->userId,
+                    'department_id' => $request->department_id,
+                    'type' => $request->inputRole,
+                ]);
+                return back()->with('success', 'Add user for department successed!');
+            }
+        }
     }
+
+    public function exportUser(Request $request, $id)
+    {
+        $users = DB::table('roles')
+            ->join('users', 'users.id', '=','roles.user_id')
+            ->join('departments', 'departments.id', '=', 'roles.department_id' )
+            ->select('users.id', 'users.name','users.email', 'users.created_at', 'users.updated_at')
+            ->where('departments.id', $id)
+            ->orderBy('name', 'desc')
+            ->get();
+//        dd($users);
+
+        Excel::create('UsersDepartment', function($excel) use ($users) {
+        $excel->sheet('List users in department', function ($sheet) use ($users){
+
+            $sheet->cell('A1', function ($cell) {
+               $cell->setValue('ID');
+               $cell->setAlignment('center');
+            });
+
+            $sheet->cell('B1', function ($cell) {
+                $cell->setValue('Name');
+                $cell->setAlignment('center');
+            });
+
+            $sheet->cell('C1', function ($cell) {
+                $cell->setValue('Email');
+                $cell->setAlignment('center');
+            });
+
+            $sheet->cell('D1', function ($cell) {
+                $cell->setValue('Created');
+                $cell->setAlignment('center');
+            });
+
+            $sheet->cell('E1', function ($cell) {
+                $cell->setValue('Updated');
+                $cell->setAlignment('center');
+            });
+
+            foreach ($users as $key => $user) {
+
+                $i = $key +2;
+//                $sheet ->cell('A'.$i, $key +1);
+                $sheet ->cell('A'.$i, $user->id);
+                $sheet ->cell('B'.$i, $user->name);
+                $sheet ->cell('C'.$i, $user->email);
+                $sheet ->cell('D'.$i, $user->created_at);
+                $sheet ->cell('E'.$i, $user->updated_at);
+            }
+        });
+//        });
+        })->download('xlsx');
+
+
+//        return Excel::download(new UsersDepartmentExport($data), 'UsersDepartment.xlsx');
+
+    }
+
+//    public function setLeader(Request $request){
+//        dd($request->all);
+//    }
 }

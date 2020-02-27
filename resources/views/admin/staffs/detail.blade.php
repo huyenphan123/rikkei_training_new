@@ -1,7 +1,7 @@
-@extends('admin.layouts.default')
+@extends('admin.layouts.app')
 @section('title', 'Update Staff')
 @section('name_feature', 'Update Staff')
-@section('content')
+@section('main-content')
 {{--    <div class="container-fluid">--}}
 {{--        <div class="container mt-3">--}}
 {{--            <div>--}}
@@ -12,18 +12,20 @@
 {{--                    </div>--}}
 
 {{--                    <div class="form-group col-md-6">--}}
-{{--                        <label >Email:</label>--}}
-{{--                        <input type="email"  value="{{$data['user']->email}}">--}}
+{{--                        <label>Email:</label>--}}
+{{--                        <input type="email" value="{{$data['user']->email}}">--}}
 {{--                    </div>--}}
 
 {{--                    <div class="form-group col-md-6">--}}
 {{--                        <label>Role:</label>--}}
-{{--                        <input value="@foreach ($data['department'] as $dep) @if($dep != end($data['department'])){{$dep->type}},@else{{$dep->type}}@endif @endforeach">--}}
+{{--                        <input--}}
+{{--                            value="@foreach ($data['department'] as $dep) @if($dep != end($data['department'])){{$dep->type}},@else{{$dep->type}}@endif @endforeach">--}}
 {{--                    </div>--}}
 
 {{--                    <div class="form-group col-md-6">--}}
 {{--                        <label>Depart:</label>--}}
-{{--                        <input value="@foreach ($data['department'] as $dep) @if($dep != end($data['department'])){{$dep->department_name}},@else{{$dep->department_name}}@endif @endforeach">--}}
+{{--                        <input--}}
+{{--                            value="@foreach ($data['department'] as $dep) @if($dep != end($data['department'])){{$dep->department_name}},@else{{$dep->department_name}}@endif @endforeach">--}}
 {{--                    </div>--}}
 {{--                </div>--}}
 {{--            </div>--}}
@@ -53,27 +55,36 @@
             </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>
-                        <center>{{$data['user']->id}}</center>
-                    </td>
-                    <td>
-                        <center>{{$data['user']->name}}</center>
-                    </td>
-                    <td>
-                        <center>{{$data['user']->email}}</center>
-                    </td>
+            <tr>
+                <td>
+                    <center>{{$user->id}}</center>
+                </td>
+                <td>
+                    <center>{{$user->name}}</center>
+                </td>
+                <td>
+                    <center>{{$user->email}}</center>
+                </td>
 
-                    <td>
+                <td>
+                    <center>
+                        @foreach ($departments as $dep)
+                            {{$dep->department_name}}
+                        @endforeach
+                    </center>
+                </td>
 
-                    </td>
+                <td>
+                    <center>
+                        @foreach ($departments as $dep)
+                            {{$dep->type}}
+                        @endforeach
+                    </center>
+                </td>
 
-                    <td>
-
-                    </td>
-                    <td>
-{{--                            </center>{{$data['departments[]']->type}}</center>--}}
-                    </td>
+                <td>
+                    <center>{{$user->is_first_login}}</center>
+                </td>
 
             </tbody>
         </table>

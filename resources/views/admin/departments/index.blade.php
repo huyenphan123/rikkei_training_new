@@ -1,26 +1,26 @@
 @extends('admin.layouts.default')
 @section('title', 'Departments')
 @section('name_feature', 'List Departments')
-@section('content')
+@section('main-content')
     <div class="container-fluid">
 
         <div class="row">
-
-            <div class="col-md-2">
-                @can('add-user')
+            @can('add-user')
+                <div class="col-md-2">
                     <a href="{{ route('departments.create')}}" class="btn bg-yellow-active" style="margin: 7px">
                         Add new department
                     </a>
-                @endcan
-            </div>
+                </div>
+            @endcan
+
             <div class="col-md-2">
-                <a href="{{ route('departments.create')}}" class="btn bg-green-active" style="margin: 7px">Export</a>
+                <a href="{{ route('departments.create')}}" class="btn bg-green-active" style="margin: 7px; width: 100%">Export</a>
             </div>
 
             <div class="col-md-6">
                 <form style="text-align: right" method="GET" action={{route('departments.index')}}>
-                    <input type="text" name="inputSearch">
-                    <button  style="margin: 7px" type="submit" method='GET'  pull-right>
+                    <input type="text" name="inputSearch" style="height: 30px;">
+                    <button  style="margin: 7px; height: 30px;" type="submit" method='GET'  pull-right>
                         <i class="fa fa-fw fa-search"></i>
                     </button>
                 </form>

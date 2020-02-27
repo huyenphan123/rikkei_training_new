@@ -9,7 +9,7 @@
     <!-- Tell the browser to be responsive to screen width -->
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
     <!-- Bootstrap 3.3.7 -->
-    <link rel="stylesheet" href="/adminLTE/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ asset('/adminLTE/css/bootstrap.min.css') }}">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="/adminLTE/css/font-awesome.min.css">
     <!-- Ionicons -->
@@ -39,22 +39,29 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/4.0.1/bootstrap3-typeahead.min.js"></script>
 
+    <script type="text/javascript" src="/admin/js/staff.js"></script>
+
 </head>
 <body class = "hold-transition skin-blue sidebar-mini">
+<div class ="wrapper">
     @include('admin.includes.header')
-    <div class="d-flex" id="wrapper">
-        @include('admin.includes.sidebar')
-        <div class="content-wrapper" style="min-height: 926px;">
+    @include('admin.includes.sidebar')
 
-            <!-- Main content -->
-            <section class="content">
-                <div id="app">
-                    @include('flash-message')
-                </div>
-                @yield('content')
+        <div class="content-wrapper" style="min-height: 926px;">
+            <section class="content-header">
+                @yield('header-content')
             </section>
+
+            <section>
+                @include('flash-message')
+            </section>
+
+            <section class="content">
+                @yield("main-content")
+            </section>
+
     </div>
-    </div>
+</div>
     @include('admin.includes.footer')
 
     <!-- jQuery 3 -->
